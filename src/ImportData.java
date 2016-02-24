@@ -7,6 +7,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Scanner;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,13 +15,26 @@ import java.io.IOException;
  * Date: 2/24/16
  * Time: 2:38 PM
  */
+
 public class ImportData
 {
-	public String [][] Import(String File) throws IOException
+	public String GetData(Sheet s, String country, int year)
+	{
+		for(int i=0; i<s.getCols(); i++)
+			if(s.values[16][i].equals(Integer.toString(year)))
+			{
+				for(int j=0; j<s.getRows(); j++)
+					if(s.values[j][2].equals(country))
+						return s.values[j][i];
+			}
+		return null;
+	}
+	public Sheet Import(String File, int sheetNum) throws IOException
 	{
 		POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(File));
 		HSSFWorkbook wb = new HSSFWorkbook(fs);
-		HSSFSheet sheet = wb.getSheetAt(0);
+		if(sheetNum>wb.getNumberOfSheets()) return null;
+		HSSFSheet sheet = wb.getSheetAt(sheetNum);
 		HSSFRow row;
 		HSSFCell cell;
 
@@ -49,11 +63,15 @@ public class ImportData
 				}
 			}
 		}
-		return res;
+		return new Sheet(rows,cols,res);
 	}
 
 	public static void main(String[] args) throws IOException
 	{
-		new ImportData().Import("Data/WPP2015_POP_F01_2_TOTAL_POPULATION_MALE.XLS");
+		Sheet data=new ImportData().Import("Data/WPP2015_POP_F01_2_TOTAL_POPULATION_MALE.XLS",0);
+		Scanner scanner=new Scanner(System.in);
+		String country=scanner.next();
+		int year=scanner.nextInt();
+		System.out.println(new ImportData().GetData(data,country,year));
 	}
 }
