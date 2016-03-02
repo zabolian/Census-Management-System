@@ -6,7 +6,9 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
 import java.io.*;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -65,16 +67,17 @@ public class ImportData
 		return new Sheet(rows,cols,res);
 	}
 	static Sheet male,female;
-	static PrintStream change;
+	static Set<String> protect;
 	public static void main(String[] args) throws IOException
 	{
+		protect=new HashSet<>();
 		ImportData importData=new ImportData();
 		male=importData.Import("Data/WPP2015_POP_F01_2_TOTAL_POPULATION_MALE.XLS",0);
 		female=importData.Import("Data/WPP2015_POP_F01_3_TOTAL_POPULATION_FEMALE.XLS",0);
 		File f = new File("Data/Changes");
 		if (f.exists())
 		{
-			Scanner changes = new Scanner(new File("Data/Changes"));
+			Scanner changes = new Scanner(f);
 			while (changes.hasNext())
 			{
 				String country = changes.next();
@@ -87,7 +90,20 @@ public class ImportData
 			}
 			changes.close();
 		}
-		change=new PrintStream(new FileOutputStream("Data/Changes",true));
+		File f2 = new File("Data/Protect");
+		if (f2.exists())
+		{
+			Scanner changes = new Scanner(f2);
+			while (changes.hasNext())
+			{
+				String country = changes.next();
+				protect.add(country);
+			}
+			changes.close();
+		}
+		PrintStream change=new PrintStream(new FileOutputStream("Data/Changes",true));
+		PrintStream protectLog=new PrintStream(new FileOutputStream("Data/Protect",true));
+
 		Scanner scanner=new Scanner(System.in);
 		while (true)
 		{
@@ -105,9 +121,20 @@ public class ImportData
 				String s=scanner.next();
 				Pair<Integer,Integer> cell=(s.equals("male")?male:female).getCell(country,year);
 				String value=scanner.next();
+				if (protect.contains(country))
+					continue;
 				if (cell!=null)
 					(s.equals("male")?male:female).values[cell.first][cell.second]=value;
 				change.println(country+" "+year+" "+s+" "+value);
+			}
+			if (com.equals("8"))
+			{
+				String country=scanner.next();
+				if (!protect.contains(country))
+				{
+					protect.add(country);
+					protectLog.println(country);
+				}
 			}
 		}
 	}
