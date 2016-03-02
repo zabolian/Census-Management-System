@@ -45,4 +45,16 @@ public class Sheet
 	{
 		this.values = values;
 	}
+
+	public Pair<Integer, Integer> getCell(String country, int year)
+	{
+		for(int i=0; i<getCols(); i++)
+			if(values[16][i].equals(Integer.toString(year)))
+			{
+				for(int j=0; j<getRows(); j++)
+					if(values[j][2].equals(country))
+						return new Pair<>(j,i);
+			}
+		return null;
+	}
 }

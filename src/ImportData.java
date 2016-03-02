@@ -1,3 +1,4 @@
+import com.sun.org.apache.xpath.internal.SourceTree;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -65,13 +66,31 @@ public class ImportData
 		}
 		return new Sheet(rows,cols,res);
 	}
-
+	Sheet male,female;
 	public static void main(String[] args) throws IOException
 	{
-		Sheet data=new ImportData().Import("Data/WPP2015_POP_F01_2_TOTAL_POPULATION_MALE.XLS",0);
+		ImportData importData=new ImportData();
+		Sheet male=importData.Import("Data/WPP2015_POP_F01_2_TOTAL_POPULATION_MALE.XLS",0);
+		Sheet female=importData.Import("Data/WPP2015_POP_F01_3_TOTAL_POPULATION_FEMALE.XLS",0);
 		Scanner scanner=new Scanner(System.in);
-		String country=scanner.next();
-		int year=scanner.nextInt();
-		System.out.println(new ImportData().GetData(data,country,year));
+		while (true)
+		{
+			String com = scanner.next();
+			if (com.equals("1"))
+			{
+				String country=scanner.next();
+				int year=scanner.nextInt();
+				System.out.println(importData.GetData(male,country,year)+" , "+importData.GetData(female,country,year));
+			}
+			if (com.equals("2"))
+			{
+				String country=scanner.next();
+				int year=scanner.nextInt();
+				String s=scanner.next();
+				Pair<Integer,Integer> cell=(s.equals("male")?male:female).getCell(country,year);
+				if (cell!=null)
+					(s.equals("male")?male:female).values[cell.first][cell.second]=scanner.next();
+			}
+		}
 	}
 }
