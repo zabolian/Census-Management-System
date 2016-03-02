@@ -5,9 +5,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.Scanner;
 
 /**
@@ -66,12 +64,30 @@ public class ImportData
 		}
 		return new Sheet(rows,cols,res);
 	}
-	Sheet male,female;
+	static Sheet male,female;
+	static PrintStream change;
 	public static void main(String[] args) throws IOException
 	{
 		ImportData importData=new ImportData();
-		Sheet male=importData.Import("Data/WPP2015_POP_F01_2_TOTAL_POPULATION_MALE.XLS",0);
-		Sheet female=importData.Import("Data/WPP2015_POP_F01_3_TOTAL_POPULATION_FEMALE.XLS",0);
+		male=importData.Import("Data/WPP2015_POP_F01_2_TOTAL_POPULATION_MALE.XLS",0);
+		female=importData.Import("Data/WPP2015_POP_F01_3_TOTAL_POPULATION_FEMALE.XLS",0);
+		File f = new File("Data/Changes");
+		if (f.exists())
+		{
+			Scanner changes = new Scanner(new File("Data/Changes"));
+			while (changes.hasNext())
+			{
+				String country = changes.next();
+				int year = changes.nextInt();
+				String s = changes.next();
+				Pair<Integer, Integer> cell = (s.equals("male") ? male : female).getCell(country, year);
+				if (cell != null)
+					(s.equals("male") ? male : female).values[cell.first][cell.second] = changes.next();
+				System.err.println("updated");
+			}
+			changes.close();
+		}
+		change=new PrintStream(new FileOutputStream("Data/Changes",true));
 		Scanner scanner=new Scanner(System.in);
 		while (true)
 		{
@@ -88,8 +104,10 @@ public class ImportData
 				int year=scanner.nextInt();
 				String s=scanner.next();
 				Pair<Integer,Integer> cell=(s.equals("male")?male:female).getCell(country,year);
+				String value=scanner.next();
 				if (cell!=null)
-					(s.equals("male")?male:female).values[cell.first][cell.second]=scanner.next();
+					(s.equals("male")?male:female).values[cell.first][cell.second]=value;
+				change.println(country+" "+year+" "+s+" "+value);
 			}
 		}
 	}
