@@ -52,7 +52,6 @@ public class ImportData
 				if(tmp > cols) cols = tmp;
 			}
 		}
-		System.err.println(cols);
 		String [][] res=new String[rows][cols];
 		for(int r = 0; r < rows; r++) {
 			res[r]=new String[cols];
@@ -126,6 +125,12 @@ public class ImportData
 				if (cell!=null)
 					(s.equals("male")?male:female).values[cell.first][cell.second]=value;
 				change.println(country+" "+year+" "+s+" "+value);
+			}
+			if (com.equals("3"))
+			{
+				int year=scanner.nextInt();
+				int sheetNo=scanner.nextInt();
+				new Lister().getList(year,sheetNo);
 			}
 			if (com.equals("8"))
 			{
