@@ -132,6 +132,12 @@ public class ImportData
 				int sheetNo=scanner.nextInt();
 				new Lister().getList(year,sheetNo);
 			}
+			if (com.equals("4"))
+						{
+							int year=scanner.nextInt();
+							int sheetNo=scanner.nextInt();
+							new Lister().getList(year,sheetNo);
+						}
 			if (com.equals("8"))
 			{
 				String country=scanner.next();
